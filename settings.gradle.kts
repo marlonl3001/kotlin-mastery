@@ -21,4 +21,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "Kotlin Mastery"
 include(":app")
- 
+include(":core:ui")
+include(":core:designsystem")
+include(":core:analytics")
+include(":core:crashlytics")
+include(":core:domain")
+include(":core:data")
+include(":feature:fundamentals")

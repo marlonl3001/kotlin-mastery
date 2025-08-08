@@ -1,0 +1,49 @@
+name: Android CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      JAVA_VERSION: '17'
+      GRADLE_OPTS: -Dorg.gradle.daemon=false
+
+    steps:
+      - name: 🔄 Code checkout
+        uses: actions/checkout@v4
+
+      - name: ☕ JDK Setup
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: 🧱 Gradle Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}
+
+      - name: 🔧 Gradle permission
+        run: chmod +x ./gradlew
+
+      - name: 🛠️ Build project
+        run: ./gradlew assembleRelease
+
+      - name: Run Ktlint
+        run: ./gradlew ktlintCheck
+
+      - name: Run Detekt
+        run: ./gradlew detekt
+
+      - name: ✅ Unit Tests
+        run: ./gradlew test
